@@ -1,0 +1,31 @@
+{
+    "name": "RwConfig",
+    "description": "A module for advancing configuration files",
+    "main": "./Config",
+    "author": "Simone Potenza simone.potenza@gmail.com",
+    "version": "0.0.1",
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/rewop/RwConfig.git"
+    },
+    "bugs" : {
+        "url" : "http://github.com/rewop/RwConfig/issues"
+    },
+    "licenses" : [
+        {
+            "type" : "MIT",
+            "url" : "ssh+http://github.com/rewop/RwConfig/raw/master/LICENSE"
+        }
+    ],
+    "private" : true,
+    "devDependencies": {
+        "nodeunit": ">0.0.0"
+    },
+    "dependencies": {
+        "fs": ">0.0.0",
+        "RwUtils" : "git://github.com/rewop/RwUtils.git"
+    },
+    "scripts": {
+        "test": "nodeunit test/test.js"
+    }
+}
