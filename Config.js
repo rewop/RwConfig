@@ -10,6 +10,7 @@
  */
 var fs = require('fs')
 var Objects = require('RwUtils').Objects;
+var utils = require("util");
 
 /**
  * Loaded configuration
@@ -28,86 +29,72 @@ var configurations = {};
  * @error Returns error if the envoronment is not present as key in the config file
  */
 
-function RwConfig(path, info, callback) {
-    
-    // is the info object passed?
-    if (info instanceof Function && !callback) {
+function RwConfig(path, info) {
 
-        // then initialize the object
-        callback = info;
+    // is the path a boolean?
+    if (typeof path === 'boolean') {
 
-        // is the path a boolean?
-        if (typeof path === 'boolean') {
+        // then we do not have the path.
+        info = path;
 
-            // then we do not have the path.
-            info = path;
-
-            // path default
-            path = process.cwd() + "/config.json";
-        } else {
-
-            // info default
-            info = false;
-        }
+        // path default
+        path = undefined;
     }
 
-    // check the path variable
-    if (path instanceof Function && !callback) {
+    // set default values
+    path = path || process.cwd() + "/config.json";
+    info = info || false;
 
-        // the path is the callback
-        callback = path;
+    /**
+     * Load the configuration from the file
+     * 
+     * @param  {Function} callback [description]
+     * @return {object}            the configuration object
+     */
+    this.load = function (callback) {
 
-        // info is a default
-        info = info || false;
+        // if a configuration path is already loaded, return it calling the callback
+        if (configurations[path]) return callback(null, configurations[path]); 
 
-        // path is the default
-        path = process.cwd() + "/config.json";
+        // read configuration file 
+        fs.readFile(path, function (err, data) {
+
+            // is there an error?
+            if (err) return callback(err);
+            
+            // set variables
+            var config = JSON.parse(data.toString());
+            var environment = process.env.NODE_ENV || config.environment;
+            var result;
+
+            // if no environment set, returns error
+            if (!environment)
+                return callback(new Error("No configuration environment is set in the configuration file or NODE_ENV."));
+
+            // if no environment keys set in the config file, returns error
+            else if (!config[environment])
+                return callback(new Error("Environment '" + environment + "' is not defined in the configuration."));
+
+            // prints info information if requested
+            if (info)
+                console.log("Configuration:", "Selecting environment setting '" +
+                    environment + "' as configured in '" +
+                    (process.env.NODE_ENV ? "NODE_ENV" : "Configuration file") + "'");
+
+            // merge shared section with environment section of the config file
+            result = Objects.merge(config.shared, config[environment]) || {};
+
+            // set up the environment
+            result.environment = environment;
+
+            // save this configuration
+            configurations[path] = result;
+
+            // done
+            return callback(null, result);
+        });
     }
-
-    // if a configuration path is already loaded, return it calling the callback
-    if (configurations[path]) { return callback(null, configurations[path]); }
-
-    //@todo use the controlFlow lib
-
-    // read configuration file 
-    fs.readFile(path, function (err, data) {
-
-        // is there an error?
-        if (err) { return callback(err); }
-
-        // set variables
-        var config = JSON.parse(data.toString());
-        var environment = process.env.NODE_ENV || config.environment;
-        var  result;
-
-        // if no environment set, returns error
-        if (!environment) {
-            return callback(new Error("No configuration environment is set in the configuration file or NODE_ENV."));
-
-        // if no environment keys set in the config file, returns error
-        } else if (!config[environment]) {
-            return callback(new Error("Environment '" + environment + "' is not defined in the configuration."));
-        }
-
-        // prints info information if requested
-        if (info) {
-            console.log("Configuration:", "Selecting environment setting '" +
-                environment + "' as configured in '" +
-                (process.env.NODE_ENV ? "NODE_ENV" : "Configuration file") + "'");
-        }
-
-        //merge shared section with environment section of the config file
-        result = Objects.merge(config.shared, config[environment]) || {};
-
-        // set up the environment
-        result.environment = environment;
-
-        // save this configuration
-        configurations[path] = result;
-
-        // done
-        return callback(null, result);
-    });
 };
 
+// exports the module
 module.exports = RwConfig
