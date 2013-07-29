@@ -122,55 +122,30 @@ This makes easy to set default values for your configuration, and override only 
 
 ### Loading the configuration for a specified environment
 
-The envLoad can be used as the `load()` function.
-
 The environment can be selected by setting up the `NODE_ENV` environmental variable.
 The variable can be set when starting the application:
 ```
 $ NODE_ENV=development node myapp.js
 ```
 
-while another way is to set the `NODE_ENV` programmatically:
+You can change the change the environment by programmatically set the `NODE_ENV` variable.
 ```
-Config = require('RwConfig');
+var Config = require('RwConfig');
+
+// the factory of the configuration
+var factory = new Config();
 
 // set the NODE_ENV environment variable
 process.env['NODE_ENV'] = "development";
 
 // get the configuration using the default path
-myConfig = Config.envLoad(function(err, conf) {
+myConfig = Config.load(true, function(err, conf) {
 
     // here the configuration in ./conf.json is loaded.
 })
 ```
 
-You can switch to different configurations by just restarting your application with a different environment,
-or giving a new value to the `NODE_ENV` variable, and reloading the configuration.
-```
-// get the development configuration
-Config = require('RwConfig');
-
-// create the config object
-myConfig = new Config('./conf.json');
-
-// load the configuration
-myConfig.load(function(err, config) {
-    
-    // throw in case of error
-    if (err) throw new Error(err);
-
-    // here i can use my config
-});
-```
-
-Now you can start your app by setting the NODE_ENV variable
-```
-$ NODE_ENV=development node myapp.js
-```
-
 You can also select an environment by setting the property `environment` in your configuration. In this way only the configuration for that environment can be load.   
-
-
 
 ### How does RwConfig overrides the configuration attributes?
 
@@ -190,11 +165,13 @@ RwConfig is not able (yet) to handle deep overridden configuration. Therefore if
 }
 ```
 The above configuration definition in development environment will result in the following configuration:
+```
 {
     myconf : {
         dev: 'dev'
     }
 }
+```
 Therefore to include the shared attribute for myconf object, you have to redefine it also in development.
 
 
