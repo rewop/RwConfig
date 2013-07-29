@@ -70,7 +70,7 @@ environments as you want. For example:
 ```
 In the previous snippets there are three configuration environments: `development`, `test` and `production`.
 
-To create the configuration with different environments, you need to use the function `envLoad()`:
+To create the configuration with different environments, you need to use the function `load()` passing a true boolean argument before the callback:
 ```
 var Config = require('RwConfig');
 
