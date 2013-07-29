@@ -19,12 +19,14 @@
     ],
     "private" : true,
     "devDependencies": {
-        "nodeunit": ">0.0.0"
+        "chai": "*",
+        "chai-things": "*",
+        "mocha": "*"
     },
     "dependencies": {
         "RwUtils" : "git://github.com/rewop/RwUtils.git"
     },
     "scripts": {
-        "test": "nodeunit test/test.js"
+        "test": "make test"
     }
 }
