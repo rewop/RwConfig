@@ -13,7 +13,7 @@ npm install git://github.com/rewop/RwConfig.git
 
 If you want to insert this module in the dependencies of your repository, just add the following line in the dependencies of your package.json
 ```
-RwUtils: git://github.com/rewop/RwConfig.git
+RwConfig: git://github.com/rewop/RwConfig.git
 ```
 
 Feel free to fork and contributing in the development of this package.
@@ -24,16 +24,20 @@ With RwConfig you can initialize an object with the json configuration.
 ```
 Config = require('RwConfig');
 
+// get the factory
+var factory = new Config();
+
 // get the config object
-mySimpleConfig = Config.load('./conf.json', function (err, conf) {
+mySimpleConfig = factory.load(__dirname+'/conf.json', function (err, conf) {
 
     // use here the configuration
 })
 ```
 
-While the callback argument is mandatory the path argument is not. In case the path is not given,
-the file `./config.json` will be
-tried to be open.
+While the callback argument is mandatory the path argument is not.  In case the path is not given,
+the file `config.json` will be used. If given, the path should be absolute. In our case we prepened the value of the
+global variable `__dirname` to the file name.
+
 ```
 Config = require('RwConfig');
 
@@ -68,12 +72,16 @@ In the previous snippets there are three configuration environments: `developmen
 
 To create the configuration with different environments, you need to use the function `envLoad()`:
 ```
-Config = require('RwConfig');
+var Config = require('RwConfig');
+
+// get the factory
+var factory = new Config();
 
 // get the configuration using the default path
-myConfig = Config.envLoad(function(err, conf) {
+myConfig = factory.load(true, function(err, conf) {
 
     // here the configuration in ./conf.json is loaded.
+    // the first boolean argument says the module that the environments should be handled.
 })
 ```
 ### Create shared or default configurations for different environments
@@ -164,8 +172,8 @@ You can also select an environment by setting the property `environment` in your
 
 
 
-How does RwConfig overrides the configuration attributes?
----------------------------------------------------------
+### How does RwConfig overrides the configuration attributes?
+
 RwConfig is not able (yet) to handle deep overridden configuration. Therefore if you have an object defined at the first level of the configuration with the same name for both shared and development environments, the object in the shared configuration will be completely overridden. 
 ```
 {
